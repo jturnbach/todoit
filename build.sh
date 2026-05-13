@@ -9,6 +9,7 @@ INFO_PLIST="Resources/Info.plist"
 
 APP_BUILD_PATH=".build/app"
 CLI_BUILD_PATH=".build/cli"
+MCP_BUILD_PATH=".build/mcp"
 
 mkdir -p build
 
@@ -26,8 +27,14 @@ swift build -c "${CONFIG}" \
     --product todoit \
     --build-path "${CLI_BUILD_PATH}"
 
+echo "→ Building todoit-mcp server (${CONFIG})…"
+swift build -c "${CONFIG}" \
+    --product todoit-mcp \
+    --build-path "${MCP_BUILD_PATH}"
+
 APP_BIN_DIR="$(swift build -c "${CONFIG}" --build-path "${APP_BUILD_PATH}" --show-bin-path)"
 CLI_BIN_DIR="$(swift build -c "${CONFIG}" --build-path "${CLI_BUILD_PATH}" --show-bin-path)"
+MCP_BIN_DIR="$(swift build -c "${CONFIG}" --build-path "${MCP_BUILD_PATH}" --show-bin-path)"
 
 echo "→ Assembling ${APP_BUNDLE}…"
 rm -rf "${APP_BUNDLE}"
@@ -39,8 +46,9 @@ cp "${INFO_PLIST}"              "${APP_BUNDLE}/Contents/Info.plist"
 printf 'APPL????'             > "${APP_BUNDLE}/Contents/PkgInfo"
 
 mkdir -p build/bin
-cp "${CLI_BIN_DIR}/todoit" build/bin/todoit
-chmod +x build/bin/todoit
+cp "${CLI_BIN_DIR}/todoit"     build/bin/todoit
+cp "${MCP_BIN_DIR}/todoit-mcp" build/bin/todoit-mcp
+chmod +x build/bin/todoit build/bin/todoit-mcp
 
 # Ad-hoc sign so macOS accepts the bundle without quarantine fuss
 codesign --force --deep --sign - "${APP_BUNDLE}" >/dev/null 2>&1 || true
@@ -48,6 +56,7 @@ codesign --force --deep --sign - "${APP_BUNDLE}" >/dev/null 2>&1 || true
 echo ""
 echo "✓ Built ${APP_BUNDLE}"
 echo "✓ Built build/bin/todoit"
+echo "✓ Built build/bin/todoit-mcp"
 echo ""
 echo "Run with:     open ${APP_BUNDLE}"
 echo "Install with: ./install.sh"

@@ -6,7 +6,8 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "TodoIt", targets: ["TodoIt"]),
-        .executable(name: "todoit", targets: ["todoitcli"])
+        .executable(name: "todoit", targets: ["todoitcli"]),
+        .executable(name: "todoit-mcp", targets: ["todoitmcp"])
     ],
     targets: [
         .target(
@@ -22,6 +23,11 @@ let package = Package(
             name: "todoitcli",
             dependencies: ["TodoItCore"],
             path: "Sources/todoit-cli"
+        ),
+        .executableTarget(
+            name: "todoitmcp",
+            dependencies: ["TodoItCore"],
+            path: "Sources/todoit-mcp"
         )
     ]
 )
